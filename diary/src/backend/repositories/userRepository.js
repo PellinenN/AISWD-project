@@ -1,0 +1,25 @@
+const db = require('../database/db');
+const { User } = require('../models/User');
+
+class UserRepository {
+    createUser(username, passwordHash) {
+        const stmt = db.prepare('INSERT INTO users (username, passwordHash) VALUES (?, ?)');
+
+        const result = stmt.run(username, passwordHash);
+        return new User(result.lastInsertRowid, username, passwordHash, new Date());
+    }
+
+    getUserByUsername(username) {
+        const row = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+        if (!row) return null;
+        return new User(row.id, row.username, row.passwordHash, row.createdAt);
+    }
+
+    getUserById(id) {
+        const row = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+        if (!row) return null;
+        return new User(row.id, row.username, row.passwordHash, row.createdAt);
+    }
+}
+
+module.exports = new UserRepository();
