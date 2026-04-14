@@ -9,7 +9,19 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS moods (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--Seed default moods
+    INSERT OR IGNORE INTO moods (name) VALUES ('Happy'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Tired'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Depressed'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Bored'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Sad'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Stressed'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Content'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Calm'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Anxious'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Excited'),
+    INSERT OR IGNORE INTO moods (name) VALUES ('Angry')
 );
 
 CREATE TABLE IF NOT EXISTS journal_entries (
@@ -33,3 +45,4 @@ CREATE TABLE IF NOT EXISTS suggestions (
 
     FOREIGN KEY (mood_id) REFERENCES moods(id)
 );
+
