@@ -3,11 +3,11 @@ import entryService from '../services/entryService.js';
 class EntryController {
     getEntries(req, res) {
         try {
-            const userId = req.query.userId ? Number(req.query.userId) : null;
-            const moodId = req.query.moodId ? Number(req.query.moodId) : null;
+            const user_id = req.query.user_id ? Number(req.query.user_id) : null;
+            const mood_id = req.query.mood_id ? Number(req.query.mood_id) : null;
             const keyword = req.query.keyword || null;
 
-            const result = entryService.getEntries(userId, moodId, keyword);
+            const result = entryService.getEntries(user_id, mood_id, keyword);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });
@@ -39,8 +39,8 @@ class EntryController {
 
     createEntry(req, res) {
         try {
-            const { userId, content, moodId } = req.body;
-            const result = entryService.createEntry(userId, content, moodId);
+            const { user_id, content, mood_id } = req.body;
+            const result = entryService.createEntry(user_id, content, mood_id);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });
@@ -56,8 +56,8 @@ class EntryController {
     updateEntry(req, res) {
         try {
             const entryId = Number(req.params.id);
-            const { userId, content, moodId } = req.body;
-            const result = entryService.updateEntry(entryId, userId, content, moodId);
+            const { user_id, content, mood_id } = req.body;
+            const result = entryService.updateEntry(entryId, user_id, content, mood_id);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });
@@ -73,8 +73,8 @@ class EntryController {
     deleteEntry(req, res) {
         try {
             const entryId = Number(req.params.id);
-            const userId = req.body.userId ? Number(req.body.userId) : null;
-            const result = entryService.deleteEntry(entryId, userId);
+            const user_id = req.body.user_id ? Number(req.body.user_id) : null;
+            const result = entryService.deleteEntry(entryId, user_id);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });

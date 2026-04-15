@@ -1,9 +1,9 @@
 import entryRepository from '../repositories/entryRepository.js';
 
 class EntryService {
-    createEntry(userId, content, moodId) {
+    createEntry(user_id, content, mood_id) {
         try {
-            if (!userId || !content || !moodId) {
+            if (!user_id || !content || !mood_id) {
                 return { success: false, entry: null, message: 'User ID, content, and mood ID are required' };
             }
 
@@ -20,7 +20,7 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
-            const entry = entryRepository.createEntry(userId, trimmedContent, moodId);
+            const entry = entryRepository.createEntry(user_id, trimmedContent, mood_id);
             return { success: true, entry, message: 'Entry created successfully' };
         } catch (error) {
             console.error('Error creating entry:', error);
@@ -28,9 +28,9 @@ class EntryService {
         }
     }
 
-    updateEntry(entryId, userId, content, moodId) {
+    updateEntry(entryId, user_id, content, mood_id) {
         try {
-            if (!entryId || !userId || !content || !moodId) {
+            if (!entryId || !user_id || !content || !mood_id) {
                 return { success: false, entry: null, message: 'Entry ID, user ID, content, and mood ID are required' };
             }
 
@@ -39,7 +39,7 @@ class EntryService {
                 return { success: false, entry: null, message: 'Entry not found' };
             }
 
-            if (existingEntry.userId !== userId) {
+            if (existingEntry.user_id !== user_id) {
                 return { success: false, entry: null, message: 'Unauthorized: You can only update your own entries' };
             }
 
@@ -52,7 +52,7 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
-            const updatedEntry = entryRepository.updateEntry(entryId, trimmedContent, moodId);
+            const updatedEntry = entryRepository.updateEntry(entryId, trimmedContent, mood_id);
             return { success: true, entry: updatedEntry, message: 'Entry updated successfully' };
         } catch (error) {
             console.error('Error updating entry:', error);
@@ -60,9 +60,9 @@ class EntryService {
         }
     }
 
-    deleteEntry(entryId, userId) {
+    deleteEntry(entryId, user_id) {
         try {
-            if (!entryId || !userId) {
+            if (!entryId || !user_id) {
                 return { success: false, message: 'Entry ID and user ID are required' };
             }
 
@@ -71,7 +71,7 @@ class EntryService {
                 return { success: false, message: 'Entry not found' };
             }
 
-            if (entry.userId !== userId) {
+            if (entry.user_id !== user_id) {
                 return { success: false, message: 'Unauthorized: You can only delete your own entries' };
             }
 
@@ -101,18 +101,18 @@ class EntryService {
         }
     }
 
-    getEntries(userId = null, moodId = null, keyword = null) {
+    getEntries(user_id = null, mood_id = null, keyword = null) {
         try {
             let entries = [];
 
-            if (keyword && userId) {
-                entries = entryRepository.searchEntriesByKeyword(userId, keyword);
-            } else if (userId && moodId) {
-                entries = entryRepository.getEntriesByUserId(userId).filter(entry => entry.moodId === moodId);
-            } else if (userId) {
-                entries = entryRepository.getEntriesByUserId(userId);
-            } else if (moodId) {
-                entries = entryRepository.getEntriesByMoodId(moodId);
+            if (keyword && user_id) {
+                entries = entryRepository.searchEntriesByKeyword(user_id, keyword);
+            } else if (user_id && mood_id) {
+                entries = entryRepository.getEntriesByUserId(user_id).filter(entry => entry.mood_id === mood_id);
+            } else if (user_id) {
+                entries = entryRepository.getEntriesByUserId(user_id);
+            } else if (mood_id) {
+                entries = entryRepository.getEntriesByMoodId(mood_id);
             } else {
                 entries = entryRepository.getAllEntries();
             }
@@ -124,9 +124,9 @@ class EntryService {
         }
     }
 
-    getUserEntries(userId, limit = 50, offset = 0) {
+    getUserEntries(user_id, limit = 50, offset = 0) {
         try {
-            if (!userId) {
+            if (!user_id) {
                 return {
                     success: false,
                     entries: [],
@@ -135,18 +135,18 @@ class EntryService {
                 };
             }
 
-            const entries = entryRepository.getEntriesByUserId(userId);
+            const entries = entryRepository.getEntriesByUserId(user_id);
             const paginatedEntries = entries.slice(offset, offset + limit);
 
             return {
                 success: true,
                 entries: paginatedEntries.map(entry => ({
                     id: entry.id,
-                    userId: entry.userId,
+                    user_id: entry.user_id,
                     content: entry.content,
-                    moodId: entry.moodId,
-                    createdAt: entry.createdAt,
-                    updatedAt: entry.updatedAt
+                    mood_id: entry.mood_id,
+                    created_at: entry.created_at,
+                    updated_at: entry.updated_at
                 })),
                 total: entries.length,
                 message: 'Entries retrieved successfully'
@@ -162,9 +162,9 @@ class EntryService {
         }
     }
 
-    searchEntries(userId, keyword) {
+    searchEntries(user_id, keyword) {
         try {
-            if (!userId || !keyword) {
+            if (!user_id || !keyword) {
                 return {
                     success: false,
                     entries: [],
@@ -182,17 +182,17 @@ class EntryService {
                 };
             }
 
-            const entries = entryRepository.searchEntriesByKeyword(userId, keyword.trim());
+            const entries = entryRepository.searchEntriesByKeyword(user_id, keyword.trim());
 
             return {
                 success: true,
                 entries: entries.map(entry => ({
                     id: entry.id,
-                    userId: entry.userId,
+                    user_id: entry.user_id,
                     content: entry.content,
-                    moodId: entry.moodId,
-                    createdAt: entry.createdAt,
-                    updatedAt: entry.updatedAt
+                    mood_id: entry.mood_id,
+                    created_at: entry.created_at,
+                    updated_at: entry.updated_at
                 })),
                 count: entries.length,
                 message: `Found ${entries.length} entries matching "${keyword}"`
@@ -208,9 +208,9 @@ class EntryService {
         }
     }
 
-    getEntriesByMood(moodId, userId = null) {
+    getEntriesByMood(mood_id, user_id = null) {
         try {
-            if (!moodId) {
+            if (!mood_id) {
                 return {
                     success: false,
                     entries: [],
@@ -219,21 +219,21 @@ class EntryService {
                 };
             }
 
-            let entries = entryRepository.getEntriesByMoodId(moodId);
+            let entries = entryRepository.getEntriesByMoodId(mood_id);
 
-            if (userId) {
-                entries = entries.filter(entry => entry.userId === userId);
+            if (user_id) {
+                entries = entries.filter(entry => entry.user_id === user_id);
             }
 
             return {
                 success: true,
                 entries: entries.map(entry => ({
                     id: entry.id,
-                    userId: entry.userId,
+                    user_id: entry.user_id,
                     content: entry.content,
-                    moodId: entry.moodId,
-                    createdAt: entry.createdAt,
-                    updatedAt: entry.updatedAt
+                    mood_id: entry.mood_id,
+                    created_at: entry.created_at,
+                    updated_at: entry.updated_at
                 })),
                 count: entries.length,
                 message: 'Entries retrieved successfully'

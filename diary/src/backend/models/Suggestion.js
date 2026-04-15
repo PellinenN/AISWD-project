@@ -1,9 +1,9 @@
 
 export class Suggestion {
-    constructor(id, triggerKeyword, moodId, text) {
+    constructor(id, trigger_keyword, mood_id, text) {
         this.id = id;
-        this.triggerKeyword = triggerKeyword;
-        this.moodId = moodId;
+        this.trigger_keyword = trigger_keyword;
+        this.mood_id = mood_id;
         this.text = text;
     }
 }

@@ -31,12 +31,12 @@ class MoodService {
 
     /**
      * Get a specific mood by ID
-     * @param {number} moodId - The mood ID
+     * @param {number} mood_id - The mood ID
      * @returns {object} - Returns { success: boolean, mood: Mood|null, message: string }
      */
-    getMoodById(moodId) {
+    getMoodById(mood_id) {
         try {
-            if (!moodId) {
+            if (!mood_id) {
                 return {
                     success: false,
                     mood: null,
@@ -44,7 +44,7 @@ class MoodService {
                 };
             }
 
-            const mood = moodRepository.getMoodById(moodId);
+            const mood = moodRepository.getMoodById(mood_id);
 
             if (!mood) {
                 return {
@@ -74,16 +74,16 @@ class MoodService {
 
     /**
      * Validate if a mood ID exists
-     * @param {number} moodId - The mood ID to validate
+     * @param {number} mood_id - The mood ID to validate
      * @returns {boolean} - Returns true if mood exists, false otherwise
      */
-    validateMoodId(moodId) {
+    validateMoodId(mood_id) {
         try {
-            if (!moodId) {
+            if (!mood_id) {
                 return false;
             }
 
-            const mood = moodRepository.getMoodById(moodId);
+            const mood = moodRepository.getMoodById(mood_id);
             return mood !== null;
         } catch (error) {
             console.error('Error validating mood ID:', error);

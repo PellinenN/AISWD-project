@@ -12,13 +12,13 @@ class UserRepository {
     getUserByUsername(username) {
         const row = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
         if (!row) return null;
-        return new User(row.id, row.username, row.passwordHash, row.createdAt);
+        return new User(row.id, row.username, row.passwordHash, row.created_at);
     }
 
     getUserById(id) {
         const row = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
         if (!row) return null;
-        return new User(row.id, row.username, row.passwordHash, row.createdAt);
+        return new User(row.id, row.username, row.passwordHash, row.created_at);
     }
 }
 

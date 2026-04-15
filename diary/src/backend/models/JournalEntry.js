@@ -1,11 +1,11 @@
 class JournalEntry {
-    constructor(id, userId, content, moodId, createdAt, updatedAt) {
+    constructor(id, user_id, content, mood_id, created_at, updated_at) {
         this.id = id;
-        this.userId = userId;
+        this.user_id = user_id;
         this.content = content;
-        this.moodId = moodId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.mood_id = mood_id;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
     }
 }
 

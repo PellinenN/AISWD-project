@@ -46,7 +46,7 @@ class AuthService {
                 user: {
                     id: user.id,
                     username: user.username,
-                    createdAt: user.createdAt
+                    created_at: user.createdAt
                 },
                 token,
                 message: 'Login successful'
@@ -122,7 +122,7 @@ class AuthService {
                 user: {
                     id: newUser.id,
                     username: newUser.username,
-                    createdAt: newUser.createdAt
+                    created_at: newUser.createdAt
                 },
                 token,
                 message: 'User registered successfully'
@@ -137,9 +137,9 @@ class AuthService {
         }
     }
 
-    generateToken(userId, username) {
+    generateToken(user_id, username) {
         return jwt.sign(
-            { id: userId, username },
+            { id: user_id, username },
             JWT_SECRET,
             { expiresIn: JWT_EXPIRY }
         );
