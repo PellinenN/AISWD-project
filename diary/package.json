@@ -22,7 +22,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "db:create": "node ./src/backend/database/migrate.js"
+    "db:create": "node ./src/backend/database/migrate.js",
+    "test:backend": "jest --config=jest.config.cjs",
+    "test:backend:coverage": "jest --config=jest.config.cjs --coverage"
   },
   "eslintConfig": {
     "extends": [
@@ -43,6 +45,12 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.23.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "babel-jest": "^29.7.0",
+    "dotenv": "^16.3.1",
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^3.0.5",
     "react-router-dom": "^7.5.2"
   }
 }

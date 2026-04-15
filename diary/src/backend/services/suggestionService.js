@@ -33,6 +33,6 @@ export class SuggestionService {
         const lowered = content.toLowerCase();
         const knownKeywords = ['Happy', 'Tired', 'Depressed', 'Bored', 'Sad', 'Stressed', 'Content', 'Calm', 'Anxious', 'Excited', 'Angry', 'exhausted', 'confused', 'lost'];
 
-        return knownKeywords.filter(keyword => lowered.includes(keyword));
+        return knownKeywords.filter(keyword => lowered.includes(keyword.toLowerCase()));
     }
 }

@@ -92,4 +92,4 @@ class MoodService {
     }
 }
 
-module.exports = new MoodService();
+export default new MoodService();

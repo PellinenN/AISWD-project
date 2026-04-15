@@ -14,4 +14,4 @@ class MoodRepository {
     }
 }
 
-module.exports = new MoodRepository();
+export default new MoodRepository();
