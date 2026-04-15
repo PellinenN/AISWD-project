@@ -1,6 +1,5 @@
-
-const db = require('../database/db');
-const Mood = require('../models/Mood');
+import db from '../database/db.js';
+import Mood from '../models/Mood.js';
 
 class MoodRepository {
     getAllMoods() {

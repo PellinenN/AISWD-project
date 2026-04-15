@@ -1,5 +1,5 @@
-const db = require('../database/db');
-const { User } = require('../models/User');
+import db from '../database/db.js';
+import User from '../models/User.js';
 
 class UserRepository {
     createUser(username, passwordHash) {

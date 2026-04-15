@@ -1,4 +1,4 @@
-export class JournalEntry {
+class JournalEntry {
     constructor(id, userId, content, moodId, createdAt, updatedAt) {
         this.id = id;
         this.userId = userId;
@@ -8,3 +8,5 @@ export class JournalEntry {
         this.updatedAt = updatedAt;
     }
 }
+
+export default JournalEntry;
