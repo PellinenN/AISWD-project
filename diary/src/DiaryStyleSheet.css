@@ -410,3 +410,18 @@ textarea {
     cursor: pointer;
     z-index: 1001;
 }
+
+/* Message display for success/error feedback */
+.message {
+    position: fixed;
+    bottom: 6rem;
+    right: 1rem;
+    padding: 1rem;
+    background-color: #667eea;
+    color: white;
+    border-radius: 0.5rem;
+    z-index: 1000;
+    max-width: 300px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

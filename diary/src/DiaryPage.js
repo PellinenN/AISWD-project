@@ -3,40 +3,27 @@ import  "./DiaryStyleSheet.css";
 import { useNavigate } from "react-router-dom";
 import Popup from "./Popup"
 import { addEntry } from "./DiaryStorage";
+import MoodSelector from "./MoodSelector";
+import SuggestionsPopup from "./SuggestionsPopup";
+import { useAuth } from "./AuthContext.js";
+import { getSuggestions } from "./services/suggestionService.js";
 import { useEffect } from "react";
-
-const formSubmission = (event) => {
-    event.preventDefault(); // Prevent the form from submitting and reloading the page
-
-    // Collect form data
-    const title = document.getElementById('title').value;
-    const text = document.getElementById('text').value;
-    const mood = document.querySelector('input[name="mood"]:checked')?.value; // Get selected mood
-    const image = document.getElementById('image').value; // Optional: Collect the image URL or path
-
-    // Call the addEntry function with the collected data
-    const newEntry = addEntry({
-        title,
-        text,
-        mood,
-        image
-    });
-
-    // Optionally, clear the form fields after submission
-    event.target.reset();
-};
 
  function DiaryPageUI() {
     const navigate = useNavigate();
+    const { userId } = useAuth();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [popupType, setPopupType] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState('');
 
     const [leftText, setLeftText] = useState("");
     const [rightText, setRightText] = useState("");
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
     const [mood, setMood] = useState("");
-    const [image, setImage] = useState("");
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('selectedTheme');
@@ -70,51 +57,53 @@ const formSubmission = (event) => {
         closePopup();
     };
 
-    const handleSave = (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
       
         const title = document.getElementById('title').value; 
-        const text = leftText;  // Use state for leftText 
-        const rightTextContent = rightText;  // Use state for rightText
-        const mood = document.querySelector('input[name="mood"]:checked')?.value;
+        const text = leftText;  // Use state for leftText
+        const moodId = mood;
 
-        const imageInput = document.getElementById('image');
-        const imageFile = imageInput ? imageInput.files[0] : null;
-
-        if (!title || !text || !mood) {
-            console.log("Title, Text, or Mood is missing");
+        if (!title || !text || !moodId) {
+            setMessage('Title, Text, and Mood are required!');
             return;
         }
 
-        let image = "";
+        if (!userId) {
+            setMessage('User not authenticated');
+            return;
+        }
 
-        if (imageFile) {
-            // If an image file is selected, convert it to base64
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                const base64String = reader.result;
+        setIsLoading(true);
+        setMessage('');
 
-                const newEntry = {
-                    title,
-                    text,
-                    rightTextContent,
-                    mood,
-                    image: base64String // Save image as base64
-                };
+        try {
+            // Add entry to backend
+            await addEntry(userId, title, text, parseInt(moodId));
+            
+            // Fetch suggestions based on mood and content
+            try {
+                const fetchedSuggestions = await getSuggestions(parseInt(moodId), text);
+                setSuggestions(fetchedSuggestions);
+                setShowSuggestions(true);
+            } catch (err) {
+                console.error('Error fetching suggestions:', err);
+            }
 
-                addEntry(newEntry); 
-            };
-            reader.readAsDataURL(imageFile);
-        } else {
-            // If no image is uploaded, save empty image
-            const newEntry = {
-                title,
-                text,
-                rightTextContent,
-                mood,
-                image: "" // No image uploaded
-            };
-            addEntry(newEntry);
+            // Reset form
+            setTitle('');
+            setLeftText('');
+            setRightText('');
+            setMood('');
+            document.getElementById('title').value = '';
+            
+            setMessage('Entry saved successfully!');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            console.error('Error saving entry:', error);
+            setMessage('Failed to save entry. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
     return (
@@ -169,60 +158,7 @@ const formSubmission = (event) => {
                     />
 
                     <div className="mood-section">
-                    <label className="entry-field">Today's Mood</label>
-                    <div className="entry-mood-tracker">
-                        <label className="entry-mood-label">Terrible</label>
-                        <input
-                        className="entry-mood-radio"
-                        type="radio"
-                        name="mood"
-                        value="1"
-                        checked={mood === "1"}
-                        onChange={(e) => setMood(e.target.value)}
-                        />
-                        <input
-                        className="entry-mood-radio"
-                        type="radio"
-                        name="mood"
-                        value="2"
-                        checked={mood === "2"}
-                        onChange={(e) => setMood(e.target.value)}
-                        />
-                        <input
-                        className="entry-mood-radio"
-                        type="radio"
-                        name="mood"
-                        value="3"
-                        checked={mood === "3"}
-                        onChange={(e) => setMood(e.target.value)}
-                        />
-                        <input
-                        className="entry-mood-radio"
-                        type="radio"
-                        name="mood"
-                        value="4"
-                        checked={mood === "4"}
-                        onChange={(e) => setMood(e.target.value)}
-                        />
-                        <input
-                        className="entry-mood-radio"
-                        type="radio"
-                        name="mood"
-                        value="5"
-                        checked={mood === "5"}
-                        onChange={(e) => setMood(e.target.value)}
-                        />
-                        <label className="entry-mood-label">Great</label>
-                    </div>
-
-                    <input
-                        className="entry-field"
-                        type="text"
-                        id="image"
-                        placeholder="Image URL"
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
-                    />
+                    <MoodSelector selectedMood={mood} onMoodSelect={setMood} />
                     </div> {/* end of mood-section */}
                 </div> {/* end of entry-form */}
                 </div> {/* end of right-page */}
@@ -233,11 +169,14 @@ const formSubmission = (event) => {
             {/*Sidebar*/}
             <div className="sidebar-button-container">
             <button className="sidebar-button" onClick={openTextPopup}>T</button>
-            <button className="sidebar-button">🖼</button>
             <button className="sidebar-button">...</button>
             </div>
 
-            <button className="save-entry-button" onClick={handleSave}>Save</button>
+            <button className="save-entry-button" onClick={handleSave} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'Save'}
+            </button>
+
+            {message && <div className="message">{message}</div>}
 
             <Popup isOpen={isPopupOpen} onClose={closePopup}>
             {popupType === 'text' && (
@@ -261,6 +200,12 @@ const formSubmission = (event) => {
                 </>
             )}
             </Popup>
+
+            <SuggestionsPopup 
+                isOpen={showSuggestions} 
+                suggestions={suggestions} 
+                onClose={() => setShowSuggestions(false)} 
+            />
 
         </div> // end of diary-container
         );
