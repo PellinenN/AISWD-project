@@ -2,11 +2,11 @@ import db from '../database/db.js';
 import JournalEntry from '../models/JournalEntry.js';
 
 class EntryRepository {
-    createEntry(user_id, content, mood_ids = []) {
+    createEntry(user_id, title, content, mood_ids = []) {
         // Insert entry with first mood_id for backward compatibility, or NULL if no moods
         const firstMoodId = mood_ids && mood_ids.length > 0 ? mood_ids[0] : null;
-        const stmt = db.prepare('INSERT INTO journal_entries (user_id, content, mood_id) VALUES (?, ?, ?)');
-        const result = stmt.run(user_id, content, firstMoodId);
+        const stmt = db.prepare('INSERT INTO journal_entries (user_id, title, content, mood_id) VALUES (?, ?, ?, ?)');
+        const result = stmt.run(user_id, title, content, firstMoodId);
         
         // Insert moods into entry_moods junction table
         if (mood_ids && mood_ids.length > 0) {
@@ -19,11 +19,11 @@ class EntryRepository {
         return this.getEntryById(result.lastInsertRowid);
     }
 
-    updateEntry(id, content, mood_ids = []) {
+    updateEntry(id, title, content, mood_ids = []) {
         // Update entry with first mood_id for backward compatibility
         const firstMoodId = mood_ids && mood_ids.length > 0 ? mood_ids[0] : null;
-        db.prepare('UPDATE journal_entries SET content = ?, mood_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-            .run(content, firstMoodId, id);
+        db.prepare('UPDATE journal_entries SET title = ?, content = ?, mood_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+            .run(title, content, firstMoodId, id);
         
         // Remove old moods and insert new ones
         db.prepare('DELETE FROM entry_moods WHERE entry_id = ?').run(id);
@@ -53,7 +53,7 @@ class EntryRepository {
             ORDER BY em.created_at ASC
         `).all(id);
         
-        return new JournalEntry(row.id, row.user_id, row.content, row.mood_id, row.created_at, row.updated_at, moods);
+        return new JournalEntry(row.id, row.user_id, row.title, row.content, row.mood_id, row.created_at, row.updated_at, moods);
     }
 
     getEntriesByUserId(user_id) {
@@ -65,7 +65,7 @@ class EntryRepository {
                 WHERE em.entry_id = ?
                 ORDER BY em.created_at ASC
             `).all(row.id);
-            return new JournalEntry(row.id, row.user_id, row.content, row.mood_id, row.created_at, row.updated_at, moods);
+            return new JournalEntry(row.id, row.user_id, row.title, row.content, row.mood_id, row.created_at, row.updated_at, moods);
         });
     }
 
@@ -83,7 +83,7 @@ class EntryRepository {
                 WHERE em.entry_id = ?
                 ORDER BY em.created_at ASC
             `).all(row.id);
-            return new JournalEntry(row.id, row.user_id, row.content, row.mood_id, row.created_at, row.updated_at, moods);
+            return new JournalEntry(row.id, row.user_id, row.title, row.content, row.mood_id, row.created_at, row.updated_at, moods);
         });
     }
 
@@ -96,7 +96,7 @@ class EntryRepository {
                 WHERE em.entry_id = ?
                 ORDER BY em.created_at ASC
             `).all(row.id);
-            return new JournalEntry(row.id, row.user_id, row.content, row.mood_id, row.created_at, row.updated_at, moods);
+            return new JournalEntry(row.id, row.user_id, row.title, row.content, row.mood_id, row.created_at, row.updated_at, moods);
         });
     }
 
@@ -110,7 +110,7 @@ class EntryRepository {
                 WHERE em.entry_id = ?
                 ORDER BY em.created_at ASC
             `).all(row.id);
-            return new JournalEntry(row.id, row.user_id, row.content, row.mood_id, row.created_at, row.updated_at, moods);
+            return new JournalEntry(row.id, row.user_id, row.title, row.content, row.mood_id, row.created_at, row.updated_at, moods);
         });
     }
 }

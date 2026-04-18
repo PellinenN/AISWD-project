@@ -13,7 +13,7 @@ function EntryPageUI() {
     const navigateToDiary = () => {navigate('/')}
 
     const [entries, setEntries] = useState([]);
-    const [moodSummaries, setMoodSummaries] = useState({});
+    const [monthSummaries, setMonthSummaries] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -30,6 +30,20 @@ function EntryPageUI() {
         return firstThreeMoods;
     };
 
+    // Group entries by month and collect moods
+    const groupEntriesByMonth = (entries) => {
+        const months = {};
+        entries.forEach(entry => {
+            const date = new Date(entry.created_at);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            if (!months[monthKey]) {
+                months[monthKey] = [];
+            }
+            months[monthKey].push(entry);
+        });
+        return months;
+    };
+
     useEffect(() => {
         const fetchEntries = async () => {
             try {
@@ -41,8 +55,8 @@ function EntryPageUI() {
                 }
                 const fetchedEntries = await getAllEntries(userId);
                 setEntries(fetchedEntries || []);
-                const summaries = await getMoodSummaries(userId);
-                setMoodSummaries(summaries || {});
+                const grouped = groupEntriesByMonth(fetchedEntries || []);
+                setMonthSummaries(grouped);
             } catch (err) {
                 console.error('Error fetching entries:', err);
                 setError('Failed to load entries');
@@ -74,14 +88,27 @@ function EntryPageUI() {
                     <div className="page-header">Mood Summaries</div>
                     <div className="sub-header">Recent Months</div>
                         <ul>
-                            {Object.entries(moodSummaries).map(([month,data]) => {
-                                const averageMood = data.count > 0 ? (data.moodSum / data.count).toFixed(2) : "N/A";
-                                const date = new Date(month + "-01");
+                            {Object.entries(monthSummaries).sort().reverse().map(([monthKey, monthEntries]) => {
+                                const [year, month] = monthKey.split('-');
+                                const date = new Date(year, parseInt(month) - 1);
                                 const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric'});
+                                
+                                // Collect all moods from entries in this month
+                                const moods = {};
+                                monthEntries.forEach(entry => {
+                                    if (entry.moods && Array.isArray(entry.moods)) {
+                                        entry.moods.forEach(mood => {
+                                            moods[mood.id] = mood.name;
+                                        });
+                                    }
+                                });
+                                const moodList = Object.values(moods).join(', ') || 'No moods';
+                                
                                 return (
-                                    <li key={month} className="entry-item">
+                                    <li key={monthKey} className="entry-item">
                                         <strong>{monthName}</strong><br/>
-                                        Avg Mood: {averageMood}
+                                        Entries: {monthEntries.length}<br/>
+                                        <small>{moodList}</small>
                                     </li>
                                 )
                             })}
@@ -110,19 +137,20 @@ function EntryPageUI() {
                     <div>
                         <input 
                             type="text"
-                            value={selectedEntry.title}
+                            value={selectedEntry.title || ''}
                             onChange={(e) => setSelectedEntry({...selectedEntry, title: e.target.value})}>
                         </input>
                     </div>
                     <div>
                         <textarea
-                            value={selectedEntry.text}
-                            onChange={(e) => setSelectedEntry({...selectedEntry, text: e.target.value})}>
+                            value={selectedEntry.content || ''}
+                            onChange={(e) => setSelectedEntry({...selectedEntry, content: e.target.value})}>
                         </textarea>
                     </div>
                     <div>
                         <button onClick={() => {
-                            updateEntry(selectedEntry.id,{title: selectedEntry.title,text: selectedEntry.text}); setSelectedEntry(null);
+                            updateEntry(selectedEntry.id, userId, selectedEntry.title, selectedEntry.content); 
+                            setSelectedEntry(null);
                             }} className="button">Save</button>
                         <button onClick={() => setSelectedEntry(null)} className="button">Cancel</button>
                     </div>

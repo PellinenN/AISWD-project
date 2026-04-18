@@ -39,10 +39,10 @@ class EntryController {
 
     createEntry(req, res) {
         try {
-            const { user_id, content, mood_ids } = req.body;
+            const { user_id, title, content, mood_ids } = req.body;
             // mood_ids can be undefined/null/empty array - all are acceptable
             const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
-            const result = entryService.createEntry(user_id, content, moodIdsArray);
+            const result = entryService.createEntry(user_id, title, content, moodIdsArray);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });
@@ -58,9 +58,9 @@ class EntryController {
     updateEntry(req, res) {
         try {
             const entryId = Number(req.params.id);
-            const { user_id, content, mood_ids } = req.body;
+            const { user_id, title, content, mood_ids } = req.body;
             const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
-            const result = entryService.updateEntry(entryId, user_id, content, moodIdsArray);
+            const result = entryService.updateEntry(entryId, user_id, title, content, moodIdsArray);
 
             if (!result.success) {
                 return res.status(400).json({ success: false, message: result.message });

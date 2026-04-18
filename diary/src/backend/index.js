@@ -1,4 +1,5 @@
 import express from 'express';
+import './database/migrate.js';
 import authRouter from './routes/authRoutes.js';
 import entryRouter from './routes/entryRoutes.js';
 import moodRouter from './routes/moodRoutes.js';

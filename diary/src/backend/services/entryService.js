@@ -1,9 +1,9 @@
 import entryRepository from '../repositories/entryRepository.js';
 
 class EntryService {
-    createEntry(user_id, content, mood_ids = []) {
+    createEntry(user_id, title, content, mood_ids = []) {
         try {
-            // user_id and content are required, mood_ids is optional
+            // user_id and content are required, title and mood_ids are optional
             if (!user_id || !content) {
                 return { success: false, entry: null, message: 'User ID and content are required' };
             }
@@ -21,10 +21,25 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
+            // Validate title if provided
+            let trimmedTitle = null;
+            if (title) {
+                if (typeof title !== 'string') {
+                    return { success: false, entry: null, message: 'Title must be a string' };
+                }
+                trimmedTitle = title.trim();
+                // Convert empty string back to null after trimming
+                if (trimmedTitle.length === 0) {
+                    trimmedTitle = null;
+                } else if (trimmedTitle.length > 500) {
+                    return { success: false, entry: null, message: 'Title cannot exceed 500 characters' };
+                }
+            }
+
             // Ensure mood_ids is an array
             const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
 
-            const entry = entryRepository.createEntry(user_id, trimmedContent, moodIdsArray);
+            const entry = entryRepository.createEntry(user_id, trimmedTitle, trimmedContent, moodIdsArray);
             return { success: true, entry, message: 'Entry created successfully' };
         } catch (error) {
             console.error('Error creating entry:', error);
@@ -32,9 +47,9 @@ class EntryService {
         }
     }
 
-    updateEntry(entryId, user_id, content, mood_ids = []) {
+    updateEntry(entryId, user_id, title, content, mood_ids = []) {
         try {
-            // user_id, content are required; mood_ids is optional
+            // user_id and content are required; title and mood_ids are optional
             if (!entryId || !user_id || !content) {
                 return { success: false, entry: null, message: 'Entry ID, user ID, and content are required' };
             }
@@ -57,10 +72,25 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
+            // Validate title if provided
+            let trimmedTitle = null;
+            if (title) {
+                if (typeof title !== 'string') {
+                    return { success: false, entry: null, message: 'Title must be a string' };
+                }
+                trimmedTitle = title.trim();
+                // Convert empty string back to null after trimming
+                if (trimmedTitle.length === 0) {
+                    trimmedTitle = null;
+                } else if (trimmedTitle.length > 500) {
+                    return { success: false, entry: null, message: 'Title cannot exceed 500 characters' };
+                }
+            }
+
             // Ensure mood_ids is an array
             const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
 
-            const updatedEntry = entryRepository.updateEntry(entryId, trimmedContent, moodIdsArray);
+            const updatedEntry = entryRepository.updateEntry(entryId, trimmedTitle, trimmedContent, moodIdsArray);
             return { success: true, entry: updatedEntry, message: 'Entry updated successfully' };
         } catch (error) {
             console.error('Error updating entry:', error);
@@ -151,6 +181,7 @@ class EntryService {
                 entries: paginatedEntries.map(entry => ({
                     id: entry.id,
                     user_id: entry.user_id,
+                    title: entry.title,
                     content: entry.content,
                     mood_id: entry.mood_id,
                     created_at: entry.created_at,
@@ -197,6 +228,7 @@ class EntryService {
                 entries: entries.map(entry => ({
                     id: entry.id,
                     user_id: entry.user_id,
+                    title: entry.title,
                     content: entry.content,
                     mood_id: entry.mood_id,
                     created_at: entry.created_at,
@@ -238,6 +270,7 @@ class EntryService {
                 entries: entries.map(entry => ({
                     id: entry.id,
                     user_id: entry.user_id,
+                    title: entry.title,
                     content: entry.content,
                     mood_id: entry.mood_id,
                     created_at: entry.created_at,

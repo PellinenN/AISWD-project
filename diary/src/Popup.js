@@ -6,7 +6,7 @@ function Popup({ isOpen, onClose, children }) {
 
   return (
     <div className="sidebar-popup" onClick={onClose}>
-      <div calssName="sidebar-popup-content" onClick={(e) => e.stopPropagation()}>
+      <div className="sidebar-popup-content" onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>

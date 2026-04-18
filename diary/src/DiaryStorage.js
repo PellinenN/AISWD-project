@@ -22,6 +22,7 @@ export const addEntry = async (userId, title, text, moodIds = []) => {
       },
       body: JSON.stringify({
         user_id: userId,
+        title: title,
         content: text,
         mood_ids: Array.isArray(moodIds) ? moodIds : [],
       }),
@@ -64,11 +65,12 @@ export const getAllEntries = async (userId) => {
  * Update an existing entry
  * @param {string} entryId - The entry ID to update
  * @param {string} userId - The user ID
+ * @param {string} title - Updated entry title
  * @param {string} text - Updated entry content
  * @param {number} mood - Updated mood ID
  * @returns {Promise<Object>} Updated entry object
  */
-export const updateEntry = async (entryId, userId, text, mood) => {
+export const updateEntry = async (entryId, userId, title, text, mood) => {
   try {
     const response = await fetch(`${API_BASE}/entries/${entryId}`, {
       method: 'PUT',
@@ -77,6 +79,7 @@ export const updateEntry = async (entryId, userId, text, mood) => {
       },
       body: JSON.stringify({
         user_id: userId,
+        title: title,
         content: text,
         mood_id: mood,
       }),
