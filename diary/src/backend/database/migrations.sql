@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,
-    mood_id INTEGER NOT NULL,
+    mood_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -33,4 +33,20 @@ CREATE TABLE IF NOT EXISTS suggestions (
 
     FOREIGN KEY (mood_id) REFERENCES moods(id)
 );
+
+-- Junction table for many-to-many relationship between entries and moods
+CREATE TABLE IF NOT EXISTS entry_moods (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id INTEGER NOT NULL,
+    mood_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (entry_id) REFERENCES journal_entries(id) ON DELETE CASCADE,
+    FOREIGN KEY (mood_id) REFERENCES moods(id) ON DELETE CASCADE,
+    UNIQUE(entry_id, mood_id)
+);
+
+-- Backfill existing entries: copy existing mood_id values to entry_moods table
+INSERT OR IGNORE INTO entry_moods (entry_id, mood_id, created_at)
+SELECT id, mood_id, CURRENT_TIMESTAMP FROM journal_entries WHERE mood_id IS NOT NULL;
 

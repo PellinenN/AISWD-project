@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import  "./DiaryStyleSheet.css";
 import { useNavigate } from "react-router-dom";
-import { getAllEntries, updateEntry, getMoodSummaries } from "./DiaryStorage";
+import { getAllEntries, updateEntry, getMoodSummaries } from "./DiaryStorage.js";
 import { useAuth } from "./AuthContext.js";
 
 {/*Draw Entry page UI*/}
 function EntryPageUI() {
-    const { userId } = useAuth();
+    const { userId, username } = useAuth();
     const [selectedEntry, setSelectedEntry] = useState(null);
 
     const navigate = useNavigate();
@@ -16,6 +16,19 @@ function EntryPageUI() {
     const [moodSummaries, setMoodSummaries] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Helper function to format moods display with "+N more" badge
+    const getMoodDisplay = (moods) => {
+        if (!moods || moods.length === 0) {
+            return 'No mood';
+        }
+        const firstThreeMoods = moods.slice(0, 3).map(m => m.name).join(', ');
+        const remaining = moods.length - 3;
+        if (remaining > 0) {
+            return `${firstThreeMoods} +${remaining}`;
+        }
+        return firstThreeMoods;
+    };
 
     useEffect(() => {
         const fetchEntries = async () => {
@@ -46,7 +59,7 @@ function EntryPageUI() {
             
         {/*Header*/}
         <div className="diary-header">
-            <button className="diary-title" onClick={navigateToDiary}>Diary Entries</button>
+            <button className="diary-title" onClick={navigateToDiary}>{username || 'Diary'}</button>
             <div className="customize-section">
                 <button>Customize page</button>
                 <span className="color-indicator"></span>
@@ -81,7 +94,8 @@ function EntryPageUI() {
                             {entries.map(entry => (
                                 <li key={entry.id} onClick={() => setSelectedEntry(entry)} className="entry-item">
                                     <strong>{entry.title}</strong><br/>
-                                    <small>{new Date(entry.timestamp).toLocaleDateString()}</small>
+                                    <small>{new Date(entry.created_at).toLocaleDateString()}</small><br/>
+                                    <small className="entry-moods">{getMoodDisplay(entry.moods)}</small>
                                 </li>
                             ))}
                         </ul>

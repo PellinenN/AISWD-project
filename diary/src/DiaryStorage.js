@@ -10,10 +10,10 @@ const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
  * @param {string} userId - The user ID
  * @param {string} title - Entry title
  * @param {string} text - Entry content
- * @param {number} mood - Mood ID
+ * @param {Array<number>} moodIds - Array of mood IDs (can be empty)
  * @returns {Promise<Object>} Created entry object
  */
-export const addEntry = async (userId, title, text, mood) => {
+export const addEntry = async (userId, title, text, moodIds = []) => {
   try {
     const response = await fetch(`${API_BASE}/entries`, {
       method: 'POST',
@@ -23,7 +23,7 @@ export const addEntry = async (userId, title, text, mood) => {
       body: JSON.stringify({
         user_id: userId,
         content: text,
-        mood_id: mood,
+        mood_ids: Array.isArray(moodIds) ? moodIds : [],
       }),
     });
 

@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ddc9ed 0%, #e37ac9 100%);
 }
 
 .login-container {
@@ -45,7 +45,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #e37ac9;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -66,7 +66,7 @@
 .login-container button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #667eea;
+  background-color: #e37ac9;
   color: white;
   border: none;
   border-radius: 5px;
@@ -77,10 +77,39 @@
 }
 
 .login-container button:hover:not(:disabled) {
-  background-color: #5568d3;
+  background-color: #e37ac9;
 }
 
 .login-container button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.toggle-auth {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  color: #e37ac9;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 0.3rem;
+  transition: color 0.3s;
+}
+
+.toggle-link:hover:not(:disabled) {
+  color: #e37ac9;
+}
+
+.toggle-link:disabled {
+  color: #999;
+  cursor: not-allowed;
+  text-decoration: none;
 }

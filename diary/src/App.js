@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext.js';
-import { LoginScreen } from './setupAuth.js';
+import { AuthScreen } from './setupAuth.js';
 import DiaryPageUI from './DiaryPage.js'; // Page to create a diary entry
 import EntryPageUI from './EntryPage.js'; // Page to view previous entries
 
@@ -13,7 +13,7 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return <LoginScreen />;
+    return <AuthScreen />;
   }
 
   return (

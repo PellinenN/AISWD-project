@@ -6,23 +6,36 @@
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
 /**
- * Get suggestions based on mood and entry content
- * @param {number} moodId - The mood ID
+ * Get suggestions based on moods and entry content
+ * @param {Array<number>|number} moodIds - The mood ID(s) (array or single value, optional)
  * @param {string} content - The entry content to analyze for keywords
  * @returns {Promise<Array>} Array of suggestion objects
  */
-export const getSuggestions = async (moodId, content) => {
+export const getSuggestions = async (moodIds = [], content = '') => {
   try {
-    if (!moodId || !content) {
-      console.warn('getSuggestions requires moodId and content');
+    // Handle empty inputs gracefully
+    if (!content) {
+      console.warn('getSuggestions requires content');
       return [];
     }
 
+    // Normalize moodIds to array
+    const moods = Array.isArray(moodIds) ? moodIds : (moodIds ? [moodIds] : []);
+    
+    // Build query string with mood IDs
+    const moodQueryString = moods.length > 0 
+      ? moods.map((id, idx) => `mood_ids[${idx}]=${id}`).join('&')
+      : '';
+    
     // Encode content for URL query parameter
     const encodedContent = encodeURIComponent(content);
-    const response = await fetch(
-      `${API_BASE}/suggestions?mood_id=${moodId}&content=${encodedContent}`
-    );
+    const separator = moodQueryString ? '&' : '';
+    
+    const url = moodQueryString
+      ? `${API_BASE}/suggestions?${moodQueryString}${separator}content=${encodedContent}`
+      : `${API_BASE}/suggestions?content=${encodedContent}`;
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch suggestions: ${response.statusText}`);

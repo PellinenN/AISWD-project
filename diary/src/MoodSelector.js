@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext.js';
-import { getAllMoods, selectMood } from './DiaryStorage.js';
+import { getAllMoods } from './DiaryStorage.js';
 
-const MoodSelector = ({ selectedMood, onMoodSelect }) => {
+const MoodSelector = ({ selectedMoods, onMoodsChange }) => {
   const { userId } = useAuth();
   const [moods, setMoods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,17 +26,13 @@ const MoodSelector = ({ selectedMood, onMoodSelect }) => {
     }
   };
 
-  const handleMoodChange = async (moodId) => {
-    try {
-      // Notify parent component
-      onMoodSelect(moodId);
-
-      // Record mood selection in backend
-      if (userId) {
-        await selectMood(userId, moodId);
-      }
-    } catch (err) {
-      console.error('Error selecting mood:', err);
+  const handleMoodToggle = (moodId) => {
+    if (selectedMoods.includes(moodId)) {
+      // Remove mood if already selected
+      onMoodsChange(selectedMoods.filter(id => id !== moodId));
+    } else {
+      // Add mood if not selected
+      onMoodsChange([...selectedMoods, moodId]);
     }
   };
 
@@ -50,27 +46,29 @@ const MoodSelector = ({ selectedMood, onMoodSelect }) => {
 
   return (
     <div className="mood-selector">
-      <label className="entry-field">Today's Mood</label>
-      <div className="entry-mood-tracker">
-        {moods.length > 0 && (
-          <>
-            <span className="entry-mood-label">{moods[0]?.name || 'Start'}</span>
-            {moods.map((mood) => (
-              <input
-                key={mood.id}
-                className="entry-mood-radio"
-                type="radio"
-                name="mood"
-                value={mood.id}
-                checked={selectedMood === String(mood.id)}
-                onChange={(e) => handleMoodChange(e.target.value)}
-                title={mood.name}
-              />
-            ))}
-            <span className="entry-mood-label">{moods[moods.length - 1]?.name || 'Great'}</span>
-          </>
+      <label className="mood-selector-label">Select Moods (Optional)</label>
+      <div className="mood-buttons-container">
+        {moods.length > 0 ? (
+          moods.map((mood) => (
+            <button
+              key={mood.id}
+              className={`mood-button ${selectedMoods.includes(mood.id) ? 'mood-button-selected' : ''}`}
+              onClick={() => handleMoodToggle(mood.id)}
+              type="button"
+              title={mood.name}
+            >
+              {mood.name}
+            </button>
+          ))
+        ) : (
+          <div className="mood-selector-empty">No moods available</div>
         )}
       </div>
+      {selectedMoods.length > 0 && (
+        <div className="mood-selector-selected">
+          Selected: {selectedMoods.length} mood(s)
+        </div>
+      )}
     </div>
   );
 };

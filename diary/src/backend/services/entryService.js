@@ -1,10 +1,11 @@
 import entryRepository from '../repositories/entryRepository.js';
 
 class EntryService {
-    createEntry(user_id, content, mood_id) {
+    createEntry(user_id, content, mood_ids = []) {
         try {
-            if (!user_id || !content || !mood_id) {
-                return { success: false, entry: null, message: 'User ID, content, and mood ID are required' };
+            // user_id and content are required, mood_ids is optional
+            if (!user_id || !content) {
+                return { success: false, entry: null, message: 'User ID and content are required' };
             }
 
             if (typeof content !== 'string') {
@@ -20,7 +21,10 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
-            const entry = entryRepository.createEntry(user_id, trimmedContent, mood_id);
+            // Ensure mood_ids is an array
+            const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
+
+            const entry = entryRepository.createEntry(user_id, trimmedContent, moodIdsArray);
             return { success: true, entry, message: 'Entry created successfully' };
         } catch (error) {
             console.error('Error creating entry:', error);
@@ -28,10 +32,11 @@ class EntryService {
         }
     }
 
-    updateEntry(entryId, user_id, content, mood_id) {
+    updateEntry(entryId, user_id, content, mood_ids = []) {
         try {
-            if (!entryId || !user_id || !content || !mood_id) {
-                return { success: false, entry: null, message: 'Entry ID, user ID, content, and mood ID are required' };
+            // user_id, content are required; mood_ids is optional
+            if (!entryId || !user_id || !content) {
+                return { success: false, entry: null, message: 'Entry ID, user ID, and content are required' };
             }
 
             const existingEntry = entryRepository.getEntryById(entryId);
@@ -52,7 +57,10 @@ class EntryService {
                 return { success: false, entry: null, message: 'Content cannot exceed 10000 characters' };
             }
 
-            const updatedEntry = entryRepository.updateEntry(entryId, trimmedContent, mood_id);
+            // Ensure mood_ids is an array
+            const moodIdsArray = Array.isArray(mood_ids) ? mood_ids : [];
+
+            const updatedEntry = entryRepository.updateEntry(entryId, trimmedContent, moodIdsArray);
             return { success: true, entry: updatedEntry, message: 'Entry updated successfully' };
         } catch (error) {
             console.error('Error updating entry:', error);

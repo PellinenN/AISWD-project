@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import  "./DiaryStyleSheet.css";
 import { useNavigate } from "react-router-dom";
-import Popup from "./Popup"
-import { addEntry } from "./DiaryStorage";
-import MoodSelector from "./MoodSelector";
-import SuggestionsPopup from "./SuggestionsPopup";
+import Popup from "./Popup.js";
+import { addEntry } from "./DiaryStorage.js";
+import MoodSelector from "./MoodSelector.js";
+import SuggestionsPopup from "./SuggestionsPopup.js";
 import { useAuth } from "./AuthContext.js";
 import { getSuggestions } from "./services/suggestionService.js";
 import { useEffect } from "react";
 
  function DiaryPageUI() {
     const navigate = useNavigate();
-    const { userId } = useAuth();
+    const { userId, username } = useAuth();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [popupType, setPopupType] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
@@ -20,11 +20,11 @@ import { useEffect } from "react";
     const [message, setMessage] = useState('');
 
     const [leftText, setLeftText] = useState("");
-    const [rightText, setRightText] = useState("");
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
-    const [mood, setMood] = useState("");
+    const [selectedMoods, setSelectedMoods] = useState([]);
 
+    
     useEffect(() => {
         const savedTheme = localStorage.getItem('selectedTheme');
         if (savedTheme) {
@@ -62,10 +62,9 @@ import { useEffect } from "react";
       
         const title = document.getElementById('title').value; 
         const text = leftText;  // Use state for leftText
-        const moodId = mood;
 
-        if (!title || !text || !moodId) {
-            setMessage('Title, Text, and Mood are required!');
+        if (!title || !text) {
+            setMessage('Title and Text are required!');
             return;
         }
 
@@ -78,12 +77,12 @@ import { useEffect } from "react";
         setMessage('');
 
         try {
-            // Add entry to backend
-            await addEntry(userId, title, text, parseInt(moodId));
+            // Add entry to backend with mood_ids array (can be empty)
+            await addEntry(userId, title, text, selectedMoods);
             
-            // Fetch suggestions based on mood and content
+            // Fetch suggestions based on moods and content
             try {
-                const fetchedSuggestions = await getSuggestions(parseInt(moodId), text);
+                const fetchedSuggestions = await getSuggestions(selectedMoods, text);
                 setSuggestions(fetchedSuggestions);
                 setShowSuggestions(true);
             } catch (err) {
@@ -93,8 +92,7 @@ import { useEffect } from "react";
             // Reset form
             setTitle('');
             setLeftText('');
-            setRightText('');
-            setMood('');
+            setSelectedMoods([]);
             document.getElementById('title').value = '';
             
             setMessage('Entry saved successfully!');
@@ -111,7 +109,7 @@ import { useEffect } from "react";
 
             {/*Header*/}
             <div className="diary-header">
-            <button className="diary-title" onClick={navigateToEntry}>Diary_name</button>
+            <button className="diary-title" onClick={navigateToEntry}>{username || 'Diary'}</button>
             <div className="customize-section">
                 <button onClick={openThemePopup}>Customize page</button> {/*Opens color popup*/}
                 <span className="color-indicator"></span>
@@ -148,17 +146,8 @@ import { useEffect } from "react";
                 {/* Right Page */}
                 <div className="right-page">
                 <div className="entry-form">
-                    <textarea
-                    className="entry-field-text right-page-text"
-                    id="rightText"
-                    maxLength="500"
-                    placeholder="Maximum 500 characters"
-                    value={rightText}
-                    onChange={(e) => setRightText(e.target.value)}
-                    />
-
                     <div className="mood-section">
-                    <MoodSelector selectedMood={mood} onMoodSelect={setMood} />
+                    <MoodSelector selectedMoods={selectedMoods} onMoodsChange={setSelectedMoods} />
                     </div> {/* end of mood-section */}
                 </div> {/* end of entry-form */}
                 </div> {/* end of right-page */}
