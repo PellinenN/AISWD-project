@@ -6,7 +6,6 @@ import { addEntry } from "./DiaryStorage.js";
 import MoodSelector from "./MoodSelector.js";
 import SuggestionsPopup from "./SuggestionsPopup.js";
 import { useAuth } from "./AuthContext.js";
-import { getSuggestions } from "./services/suggestionService.js";
 import { useEffect } from "react";
 
  function DiaryPageUI() {
@@ -57,53 +56,54 @@ import { useEffect } from "react";
         closePopup();
     };
 
-    const handleSave = async (event) => {
-        event.preventDefault();
-      
-        const title = document.getElementById('title').value; 
-        const text = leftText;  // Use state for leftText
+const handleSave = async (event) => {
+    event.preventDefault();
+  
+    // Use the state values directly
+    if (!title || !leftText) {
+        setMessage('Title and Text are required!');
+        return;
+    }
 
-        if (!title || !text) {
-            setMessage('Title and Text are required!');
-            return;
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+        await addEntry(userId, title, leftText, selectedMoods);
+        
+        const params = new URLSearchParams();
+        selectedMoods.forEach((id, index) => {
+            params.append(`mood_ids[${index}]`, id);
+        });
+        params.append('content', leftText);
+
+        const response = await fetch(`http://localhost:5000/suggestions?${params.toString()}`);
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const fetchedSuggestions = await response.json();
+        
+        if (fetchedSuggestions && fetchedSuggestions.length > 0) {
+            setSuggestions(fetchedSuggestions);
+            setShowSuggestions(true);
+            // NOTICE: We are NOT clearing the form yet! 
+            // We want the user to see what they wrote alongside the suggestions.
         }
 
-        if (!userId) {
-            setMessage('User not authenticated');
-            return;
-        }
+        setMessage('Entry saved successfully!');
+        
+        // Optional: Clear only the title/text if you REALLY want to, 
+        // but keep moods until popup closes.
+        // setTitle('');
+        // setLeftText('');
 
-        setIsLoading(true);
-        setMessage('');
-
-        try {
-            // Add entry to backend with mood_ids array (can be empty)
-            await addEntry(userId, title, text, selectedMoods);
-            
-            // Fetch suggestions based on moods and content
-            try {
-                const fetchedSuggestions = await getSuggestions(selectedMoods, text);
-                setSuggestions(fetchedSuggestions);
-                setShowSuggestions(true);
-            } catch (err) {
-                console.error('Error fetching suggestions:', err);
-            }
-
-            // Reset form
-            setTitle('');
-            setLeftText('');
-            setSelectedMoods([]);
-            document.getElementById('title').value = '';
-            
-            setMessage('Entry saved successfully!');
-            setTimeout(() => setMessage(''), 3000);
-        } catch (error) {
-            console.error('Error saving entry:', error);
-            setMessage('Failed to save entry. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    } catch (error) {
+        console.error('Error:', error);
+        setMessage('Failed to save entry.');
+    } finally {
+        setIsLoading(false);
+    }
+};
     return (
         <div className="diary-container">
 

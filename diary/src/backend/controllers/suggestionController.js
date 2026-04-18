@@ -3,9 +3,8 @@ import { SuggestionService } from '../services/suggestionService.js';
 const suggestionService = new SuggestionService();
 
 class SuggestionController {
-    getSuggestions(req, res) {
+    getSuggestions = (req, res) => {
         try {
-            // Handle mood_ids array from query parameters (mood_ids[0]=1&mood_ids[1]=2)
             const mood_ids = [];
             let index = 0;
             while (req.query[`mood_ids[${index}]`] !== undefined) {
