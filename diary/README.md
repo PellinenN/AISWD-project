@@ -1,70 +1,121 @@
-# Getting Started with Create React App
+# AI-Powered Diary Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack journaling application with AI-powered suggestions, mood tracking, and theme customization.
+
+## Features
+
+- **User Authentication**: Secure signup and login with JWT-based authentication
+- **Diary Entries**: Create and view journal entries with title and content
+- **Mood Tracking**: Select multiple moods for each entry to track emotional patterns
+- **AI Suggestions**: Get personalized suggestions based on your entry content
+- **Theme Customization**: Choose from multiple themes to personalize your experience
+- **Entry History**: Browse and view all your previous journal entries
+- **Secure Storage**: All data encrypted and securely stored in SQLite database
+
+## Tech Stack
+
+- **Frontend**: React 19, React Router
+- **Backend**: Express.js
+- **Database**: SQLite (better-sqlite3)
+- **Authentication**: JWT with bcrypt password hashing
+- **Testing**: Jest, React Testing Library
+- **Containerization**: Docker & Docker Compose
+
+## Project Structure
+
+```
+src/
+├── App.js                    # Main application component
+├── AuthContext.js            # Authentication context provider
+├── DiaryPage.js             # Create diary entry page
+├── EntryPage.js             # View entries page
+├── MoodSelector.js          # Mood selection component
+├── SuggestionsPopup.js      # AI suggestions popup
+├── DiaryStorage.js          # API client for diary operations
+├── backend/                 # Express.js backend
+│   ├── index.js            # Server entry point
+│   ├── controllers/        # Request handlers
+│   ├── services/           # Business logic
+│   ├── repositories/       # Data access layer
+│   ├── models/             # Data models
+│   ├── routes/             # API routes
+│   └── database/           # Database setup & migrations
+└── tests/                  # Test suite (unit & integration)
+```
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+ (for local development)
+- Docker & Docker Compose (for containerized setup)
+
+### Local Development
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Setup database**
+   ```bash
+   npm run db:create
+   ```
+
+3. **Start backend server** (in one terminal)
+   ```bash
+   npm run start:backend
+   ```
+
+4. **Start React frontend** (in another terminal)
+   ```bash
+   npm start
+   ```
+
+   The app will open at [http://localhost:3000](http://localhost:3000)
+
+### Docker Setup
+
+For complete setup instructions using Docker, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
+
+```bash
+docker-compose up --build
+```
+
+Access the application at [http://localhost:5000](http://localhost:5000)
 
 ## Available Scripts
 
-In the project directory, you can run:
+### Frontend
+- `npm start` - Start development server (React)
+- `npm build` - Create production build
+- `npm test` - Run frontend tests in watch mode
 
-### `npm start`
+### Backend
+- `npm run start:backend` - Start Express server
+- `npm run db:create` - Initialize database
+- `npm run test:backend` - Run backend tests
+- `npm run test:backend:coverage` - Run tests with coverage report
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## API Endpoints
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Auth**: `POST /auth/signup`, `POST /auth/login`, `POST /auth/logout`
+- **Entries**: `GET /entries`, `POST /entries`, `GET /entries/:id`, `PUT /entries/:id`, `DELETE /entries/:id`
+- **Moods**: `GET /moods`
+- **Suggestions**: `GET /suggestions/:entryId`
 
-### `npm test`
+## Environment Variables
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `NODE_ENV` - Application environment (development/production)
+- `PORT` - Backend server port (default: 5000)
+- `JWT_SECRET` - Secret key for JWT signing
+- `JWT_EXPIRY` - Token expiration time (default: 7d)
+- `CORS_ORIGIN` - CORS origin for cross-origin requests
 
-### `npm run build`
+## Testing
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Run the complete test suite:
+```bash
+npm run test:backend:coverage
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The project includes comprehensive unit and integration tests for all components.
